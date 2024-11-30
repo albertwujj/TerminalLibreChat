@@ -34,7 +34,7 @@ export default defineConfig({
       cachedChecks: false,
     },
     host: 'localhost',
-    port: 3090,
+    port: 3080,
     strictPort: false,
     proxy: {
       '/api': {

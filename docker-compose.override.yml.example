@@ -65,7 +65,7 @@
 #       - '8081:8081'
 #     depends_on:
 #       - mongodb
-#     restart: always
+#     restart: no
 
 # # USE MONGODB V4.4.18 - FOR OLDER CPU WITHOUT AVX SUPPORT
 #   mongodb:
@@ -165,7 +165,7 @@
 #      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=${LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES:-false}
 #  db:
 #    image: postgres
-#    restart: always
+#    restart: no
 #    environment:
 #      - POSTGRES_USER=postgres
 #      - POSTGRES_PASSWORD=PostgresChangeMe

@@ -31,8 +31,8 @@
     "delete-user": "node config/delete-user.js",
     "update-banner": "node config/update-banner.js",
     "delete-banner": "node config/delete-banner.js",
-    "backend": "cross-env NODE_ENV=production node api/server/index.js",
-    "backend:dev": "cross-env NODE_ENV=development npx nodemon api/server/index.js",
+    "backend": "NODE_ENV=production node api/server/index.js",
+    "backend:dev": "NODE_ENV=development npx nodemon api/server/index.js",
     "backend:stop": "node config/stop-backend.js",
     "build:data-provider": "cd packages/data-provider && npm run build",
     "frontend": "npm run build:data-provider && cd client && npm run build",
@@ -80,7 +80,6 @@
     "@playwright/test": "^1.38.1",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "cross-env": "^7.0.3",
     "eslint": "^8.41.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.9.0",
@@ -98,6 +97,9 @@
     "prettier-eslint": "^15.0.1",
     "prettier-eslint-cli": "^7.1.0",
     "prettier-plugin-tailwindcss": "^0.2.2"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3"
   },
   "overrides": {
     "vite-plugin-pwa": {

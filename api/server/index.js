@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const path = require('path');
 require('module-alias')({ base: path.resolve(__dirname, '..') });
@@ -21,6 +22,7 @@ const AppService = require('./services/AppService');
 const staticCache = require('./utils/staticCache');
 const noIndex = require('./middleware/noIndex');
 const routes = require('./routes');
+
 
 const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION } = process.env ?? {};
 
@@ -109,7 +111,9 @@ const startServer = async () => {
   app.use('/api/banner', routes.banner);
   app.use('/api/bedrock', routes.bedrock);
 
+
   app.use('/api/tags', routes.tags);
+  app.use('/api/ssh', routes.ssh);
 
   app.use((req, res) => {
     res.set({
