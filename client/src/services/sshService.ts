@@ -7,9 +7,32 @@ interface SSHConfig {
 
 export class SSHService {
   private static config: SSHConfig | null = null;
+  private static lastHost: string | null = null;
 
   static setConfig(config: SSHConfig) {
+    if (this.lastHost && this.lastHost !== config.host) {
+      this.disconnect();
+    }
     this.config = config;
+    this.lastHost = config.host;
+  }
+
+  static async disconnect() {
+    if (!this.config) return;
+
+    try {
+      await fetch('/api/ssh/disconnect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          config: this.config,
+        }),
+      });
+    } catch (error) {
+      console.error('SSH disconnect error:', error);
+    }
   }
 
   static async executeCommand(command: string): Promise<{ output: string; error?: string }> {
