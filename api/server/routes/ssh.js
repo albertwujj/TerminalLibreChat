@@ -8,6 +8,39 @@ let currentHost = null;
 
 router.post('/execute', async (req, res) => {
   const { command, config } = req.body;
+  
+  // If no config provided, check if we have an existing connection
+  if (!config) {
+    if (!currentSSH) {
+      return res.status(401).json({ error: 'SSH configuration required' });
+    }
+    
+    try {
+      // Test if connection is still alive
+      await currentSSH.execCommand('echo 1');
+    } catch (error) {
+      currentSSH = null;
+      currentHost = null;
+      return res.status(401).json({ error: 'SSH configuration required' });
+    }
+    
+    try {
+      const result = await currentSSH.execCommand(command);
+      return res.json({
+        output: result.stdout || result.stderr,
+        error: result.stderr ? result.stderr : undefined,
+      });
+    } catch (error) {
+      currentSSH.dispose();
+      currentSSH = null;
+      currentHost = null;
+      return res.status(500).json({
+        output: '',
+        error: error.message,
+      });
+    }
+  }
+
   const connectionString = `${config.username}@${config.host}`;
 
   try {

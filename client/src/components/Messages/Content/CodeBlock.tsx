@@ -27,6 +27,7 @@ const CodeBar: React.FC<CodeBarProps> = React.memo(({ lang, codeRef, error, plug
   const [showSSHConfig, setShowSSHConfig] = useState(false);
   const [output, setOutput] = useState<string | null>(null);
   const isShellScript = (lang == 'bash' || lang == 'shell');
+  const [pendingCommand, setPendingCommand] = useState<string | null>(null);
 
   const handleRunScript = async () => {
     try {
@@ -34,16 +35,35 @@ const CodeBar: React.FC<CodeBarProps> = React.memo(({ lang, codeRef, error, plug
       const codeString = codeRef.current?.textContent;
       if (!codeString) return;
 
-      const result = await SSHService.executeCommand(codeString.trim());
+      const trimmedCode = codeString.trim();
+      const result = await SSHService.executeCommand(trimmedCode);
+      
+      if (result.needsConfig) {
+        setPendingCommand(trimmedCode);
+        setShowSSHConfig(true);
+        return;
+      }
+      
       setOutput(result.output);
       if (result.error) {
         console.error('SSH execution error:', result.error);
       }
     } catch (error) {
       console.error('Failed to execute script:', error);
-      setShowSSHConfig(true);
     } finally {
       setIsRunning(false);
+    }
+  };
+
+  const handleConfigClose = async () => {
+    setShowSSHConfig(false);
+    if (pendingCommand) {
+      const result = await SSHService.executeCommand(pendingCommand);
+      setOutput(result.output);
+      if (result.error) {
+        console.error('SSH execution error:', result.error);
+      }
+      setPendingCommand(null);
     }
   };
 
@@ -100,7 +120,9 @@ const CodeBar: React.FC<CodeBarProps> = React.memo(({ lang, codeRef, error, plug
           <pre className="whitespace-pre-wrap text-sm text-white">{output}</pre>
         </div>
       )}
-      <SSHConfigModal isOpen={showSSHConfig} onClose={() => setShowSSHConfig(false)} />
+      {showSSHConfig && (
+        <SSHConfigModal isOpen={showSSHConfig} onClose={handleConfigClose} />
+      )}
     </>
   );
 });

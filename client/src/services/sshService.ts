@@ -35,11 +35,7 @@ export class SSHService {
     }
   }
 
-  static async executeCommand(command: string): Promise<{ output: string; error?: string }> {
-    if (!this.config) {
-      throw new Error('SSH configuration not set');
-    }
-
+  static async executeCommand(command: string): Promise<{ output: string; error?: string; needsConfig?: boolean }> {
     try {
       const response = await fetch('/api/ssh/execute', {
         method: 'POST',
@@ -48,9 +44,13 @@ export class SSHService {
         },
         body: JSON.stringify({
           command,
-          config: this.config,
+          config: this.config || undefined,
         }),
       });
+
+      if (response.status === 401) {
+        return { output: '', needsConfig: true };
+      }
 
       if (!response.ok) {
         throw new Error('Failed to execute command');
